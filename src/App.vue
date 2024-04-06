@@ -1,9 +1,8 @@
 <script setup>
-import Settings from "./containers/Settings.vue"
 </script>
 
 <template>
-  <Settings></Settings>
+  <router-view></router-view>
 </template>
 
 <style scoped>

@@ -1,62 +1,97 @@
-<script setup>
-import {ref} from "vue";
-
-const range = ref(5)
-const complexity = ref(5)
-const selected = ref({
-  sum: true,
-  difference: false,
-  multiply: false,
-  division: true,
-  sqrt: true
-})
-</script>
-
 <template>
-  <div class="settings">
-    <div class="settings_head">
-      <h3 style="text-align: center">Игра</h3>
-      <p style="color: darkblue">Ваш последнйи результат - решено 10 из 25</p>
-    </div>
-    <div class="settings_body">
-      <div class="settings_child">
-        <span>Настройки</span>
-        <br>
-        <input type="range" min="1" max="15" v-model="range" class="slider"/>
-        <br>
-        <label>Длительность - {{ range }} минут </label>
-        <br>
-        <input type="range" min="1" max="15" v-model="complexity" class="slider"/>
-        <br>
-        <label>Сложность {{ complexity }}</label>
-        <br>
-        <label class="container">Суммирование
-          <input type="checkbox" v-model="selected.sum">
-          <span class="checkmark"></span>
-        </label>
-        <label class="container">Разность
-          <input type="checkbox" v-model="selected.difference">
-          <span class="checkmark"></span>
-        </label>
-        <label class="container">Умножение
-          <input type="checkbox" v-model="selected.multiply">
-          <span class="checkmark"></span>
-        </label>
-        <label class="container">Деление
-          <input type="checkbox" v-model="selected.division">
-          <span class="checkmark"></span>
-        </label>
-        <label class="container">Возведение в степень
-          <input type="checkbox" v-model="selected.sqrt">
-          <span class="checkmark"></span>
-        </label>
+  <div>
+    <div class="settings">
+      <div class="settings_head">
+        <h3 style="text-align: center">Игра</h3>
+        <p style="color: darkblue" v-if="last">Ваш последнйи результат - решено {{ last.countCorrect }} из
+          {{ last.countAll }}</p>
       </div>
-      <div>
-        <button class="button">Старт</button>
+      <div class="settings_body">
+        <div class="settings_child">
+          <span>Настройки</span>
+          <br>
+          <input type="range" min="1" max="15" v-model="range" class="slider"/>
+          <br>
+          <label>Длительность - {{ range }} минут </label>
+          <br>
+          <input type="range" min="1" max="15" v-model="complexity" class="slider"/>
+          <br>
+          <label>Сложность {{ complexity }}</label>
+          <br>
+          <label class="container">Суммирование
+            <input type="checkbox" v-model="selected.sum">
+            <span class="checkmark"></span>
+          </label>
+          <label class="container">Разность
+            <input type="checkbox" v-model="selected.difference">
+            <span class="checkmark"></span>
+          </label>
+          <label class="container">Умножение
+            <input type="checkbox" v-model="selected.multiply">
+            <span class="checkmark"></span>
+          </label>
+          <label class="container">Деление
+            <input type="checkbox" v-model="selected.division">
+            <span class="checkmark"></span>
+          </label>
+          <label class="container">Возведение в степень
+            <input type="checkbox" v-model="selected.sqrt">
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div>
+          <button class="button" @click="start">Старт</button>
+        </div>
+      </div>
+    </div>
+    <div class="settings" v-if="results.length">
+      <div class="settings_head">
+        <h3 style="text-align: center">Статистика</h3>
+        <template v-for="(res, resIndex) in results">
+          <p style="color: darkblue">{{resIndex + 1}}) Ваш результат - решено {{ res.countCorrect }} из {{ res.countAll }}</p>
+        </template>
       </div>
     </div>
   </div>
 </template>
+
+<script>
+import router from "../router/index.js";
+import _ from 'lodash'
+
+export default {
+  name: "Settings",
+  data() {
+    return {
+      range: 5,
+      complexity: 5,
+      selected: {
+        sum: true,
+        difference: false,
+        multiply: false,
+        division: true,
+        sqrt: true
+      },
+    }
+  },
+  methods: {
+    start() {
+      this.$store.commit('setTimer', this.range)
+      this.$store.commit('setSettings', this.selected)
+      this.$store.commit('setComplexity', this.complexity)
+      router.push('/play')
+    },
+  },
+  computed: {
+    results() {
+      return this.$store.getters.results
+    },
+    last() {
+      if (this.results.length) return _.last(this.results)
+    }
+  }
+}
+</script>
 
 <style scoped>
 .settings {
@@ -64,7 +99,7 @@ const selected = ref({
   margin-right: auto;
   width: 40%;
   background: #eef1f5;
-  margin-top: 140px;
+  margin-top: 70px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -85,7 +120,6 @@ const selected = ref({
 .settings_child {
   display: flex;
   flex-direction: column;
-  margin-bottom: 50px;
 }
 
 .container {
@@ -157,6 +191,7 @@ const selected = ref({
   display: inline-block;
   font-size: 16px;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 
 .button:hover {
