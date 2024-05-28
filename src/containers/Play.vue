@@ -29,7 +29,7 @@
 </template>
 <script>
 import {FwbProgress} from 'flowbite-vue'
-import _ from 'lodash'
+import {getOperation, getRandomOperation} from "../utils/index.js";
 
 export default {
   name: "Play",
@@ -52,6 +52,7 @@ export default {
     }
   },
   methods: {
+    getOperation,
     check() {
       switch (this.operation) {
         case 'difference':
@@ -72,35 +73,14 @@ export default {
       }
       this.generateTask()
     },
-    getOperation(operation) {
-      switch (operation) {
-        case 'difference':
-          return '-'
-        case 'division':
-          return '/'
-        case 'multiply':
-          return '*'
-        case 'sqrt':
-          return '^'
-        case 'sum':
-          return '+'
-      }
-    },
     generateTask() {
       this.num1 = Math.floor(Math.random() * (5 * this.complexity)) + 1
       this.num2 = Math.floor(Math.random() * (5 * this.complexity)) + 1
-      this.operation = this.getRandomOperation()
+      this.operation = this.getRandomOperation(this.settings)
       this.answer = null
       this.countAll++
     },
-    getRandomOperation() {
-      let operations = []
-      _.forEach(this.settings, (item, key) => {
-        if (item) operations.push(key)
-      })
-      let randomIndex = Math.floor(Math.random() * operations.length)
-      return operations[randomIndex]
-    },
+    getRandomOperation,
     runTimer() {
       this.interval = setInterval(() => {
         if (this.progress <= 0) {
